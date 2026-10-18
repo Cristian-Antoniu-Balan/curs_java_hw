@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: library
+  mvc:
+    problemDetails:
+      enabled: true

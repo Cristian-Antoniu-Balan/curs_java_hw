@@ -1,10 +1,8 @@
 library:
   seed-books:
-    - id: dune
-      title: Dune
+    - title: Dune
       author: Frank Herbert
       copies: 3
-    - id: hobbit
-      title: The Hobbit
+    - title: The Hobbit
       author: J.R.R. Tolkien
       copies: 1

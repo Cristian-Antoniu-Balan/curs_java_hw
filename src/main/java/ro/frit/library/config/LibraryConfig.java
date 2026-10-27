@@ -1,29 +1,28 @@
 package ro.frit.library.config;
 
-import java.util.List;
+import java.util.UUID;
 
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import ro.frit.library.config.LibraryProperties.SeedBook;
 import ro.frit.library.domain.Book;
-import ro.frit.library.domain.Library;
+import ro.frit.library.repository.BookRepository;
 
 @Configuration
 public class LibraryConfig {
 
     @Bean 
-    public Library library(LibraryProperties libraryProperties) {
-        List<Book> books = libraryProperties.seedBooks().stream()
+    ApplicationRunner seedBooks(LibraryProperties libraryProperties, BookRepository bookRepository) {
+        return args -> libraryProperties.seedBooks().stream()
             .map(LibraryConfig::toBook)
-            .toList();
-            
-        return new Library(books);
+            .forEach(bookRepository::save);
     }
 
     private static Book toBook(SeedBook seedBook) {
         return Book.builder()
-                .id(seedBook.id())
+                .id(UUID.randomUUID().toString())
                 .title(seedBook.title())
                 .author(seedBook.author())
                 .copies(seedBook.copies())

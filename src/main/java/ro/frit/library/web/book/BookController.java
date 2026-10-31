@@ -16,6 +16,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import static org.springframework.http.HttpStatus.NOT_FOUND;
@@ -23,14 +28,17 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 import lombok.RequiredArgsConstructor;
 import ro.frit.library.service.book.BookService;
 
+@Tag(name = "Books", description = "Book catalog")
 @RestController 
 @RequestMapping("/books")
 @RequiredArgsConstructor 
 public class BookController {
     private final BookService bookService;
 
+    @Operation(summary = "List books")
     @GetMapping
     public List<BookResponse> getAllBooks(
+        @Parameter(description = "If true, only books with free copies; if false, only fully loaned; omit for all")
         @RequestParam(value = "available", required = false) Boolean available
     ) {
         return bookService.findAll(available).stream()
@@ -38,6 +46,8 @@ public class BookController {
             .toList();
     }
 
+    @Operation(summary = "Get book by id")
+    @ApiResponse(responseCode = "404", description = "Book not found")
     @GetMapping("/{id}")
     public BookResponse book(@PathVariable("id") String id) {
         return bookService.findById(id)
@@ -45,12 +55,24 @@ public class BookController {
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Book not found for id: " + id));    
     }
 
+    @Operation(summary = "Create book")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Created"),
+        @ApiResponse(responseCode = "400", description = "Validation failed")
+    })
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     public BookResponse postBook(@Valid @RequestBody BookRequest bookRequest) {
         return BookResponse.from(bookService.create(bookRequest));
     }
 
+    @Operation(summary = "Replace book")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Replaced"),
+        @ApiResponse(responseCode = "400", description = "Validation failed"),
+        @ApiResponse(responseCode = "404", description = "Book not found"),
+        @ApiResponse(responseCode = "409", description = "Copies less than currently loaned copies")
+    })
     @PutMapping("/{id}")
     public BookResponse putBook(
             @PathVariable("id") String id,
@@ -60,6 +82,13 @@ public class BookController {
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Book not found for id: " + id));
     }
 
+    @Operation(summary = "Partially update book", description = "Null fields are left unchanged")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Updated"),
+        @ApiResponse(responseCode = "400", description = "Validation failed or blank title/author"),
+        @ApiResponse(responseCode = "404", description = "Book not found"),
+        @ApiResponse(responseCode = "409", description = "Copies less than currently loaned copies")
+    })
     @PatchMapping("/{id}")
     public BookResponse patchBook(
             @PathVariable("id") String id,
@@ -69,6 +98,12 @@ public class BookController {
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Book not found for id: " + id));
     }
 
+    @Operation(summary = "Delete book")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Deleted"),
+        @ApiResponse(responseCode = "404", description = "Book not found"),
+        @ApiResponse(responseCode = "409", description = "Book has active loans")
+    })
     @DeleteMapping("/{id}")
     public void deleteBook(@PathVariable("id") String id) {
         if (!bookService.delete(id)) {

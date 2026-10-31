@@ -82,15 +82,13 @@ public class LoanService {
         return loanRepository.save(returnedLoan);
     }
 
-    public List<Loan> findAll() {
-        return loanRepository.findAll();
+    public List<Loan> findAll(Boolean active) {
+        return loanRepository.findAll().stream()
+            .filter(loan -> active == null || loan.isActive() == active)
+            .toList();
     }
 
     public Optional<Loan> findById(String id) {
         return loanRepository.findByLoanId(id);
-    }
-
-    public List<Loan> findAllByMemberId(String id) {
-        return loanRepository.findAllByMemberId(id);
     }
 }

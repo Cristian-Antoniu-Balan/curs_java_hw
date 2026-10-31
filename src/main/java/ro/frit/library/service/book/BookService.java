@@ -18,8 +18,10 @@ import ro.frit.library.web.book.BookUpdateRequest;
 public class BookService {
     private final BookRepository bookRepository;
 
-    public List<Book> findAll() {
-        return bookRepository.findAll();
+    public List<Book> findAll(Boolean available) {
+        return bookRepository.findAll().stream()
+            .filter(book -> available == null || book.isAvailable() == available)
+            .toList();
     }
 
     public Optional<Book> findById(String id) {

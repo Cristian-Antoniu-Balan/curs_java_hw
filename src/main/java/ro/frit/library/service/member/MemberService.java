@@ -7,8 +7,11 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import ro.frit.library.domain.loan.Loan;
 import ro.frit.library.domain.member.Member;
+import ro.frit.library.repository.loan.LoanRepository;
 import ro.frit.library.repository.member.MemberRepository;
+import ro.frit.library.service.ConflictException;
 import ro.frit.library.service.EmailAlreadyInUseException;
 import ro.frit.library.web.member.MemberRequest;
 
@@ -16,6 +19,7 @@ import ro.frit.library.web.member.MemberRequest;
 @RequiredArgsConstructor 
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final LoanRepository loanRepository;
 
     public List<Member> findAll() {
         return memberRepository.findAll();
@@ -64,6 +68,14 @@ public class MemberService {
 
         if (existing.isEmpty()) {
             return false;
+        }
+
+        boolean hasActiveLoans = loanRepository.findAllByMemberId(id).stream()
+            .filter(Loan::isActive)
+            .findAny()
+            .isPresent();
+        if (hasActiveLoans) {
+            throw new ConflictException("Cannot delete member with active loans");
         }
 
         return memberRepository.deleteById(id);

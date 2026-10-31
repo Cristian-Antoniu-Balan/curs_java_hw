@@ -5,9 +5,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
+// import java.util.stream.Collectors;
 
 import ro.frit.library.domain.book.Book;
+import ro.frit.library.domain.loan.Loan;
 
 public class Library {
     private Map<String, Book> books = new LinkedHashMap<>();
@@ -36,8 +37,8 @@ public class Library {
                 .toList();
     }
 
-    public Map<String, Long> loansPerMember() {
-        return loans.stream()
-                .collect(Collectors.groupingBy(Loan::getMemberEmail, Collectors.counting()));
-    }
+    // public Map<String, Long> loansPerMember() {
+    //     return loans.stream()
+    //             .collect(Collectors.groupingBy(Loan::getMemberEmail, Collectors.counting()));
+    // }
 }

@@ -1,4 +1,4 @@
-package ro.frit.library.domain;
+package ro.frit.library.domain.loan;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +18,11 @@ import lombok.ToString;
 public class Loan {
     private String id;
     private String bookId;
-    private String memberEmail;
+    private String memberId;
     private LocalDateTime loanedAt;
+    private LocalDateTime returnedAt;
+
+    public boolean isActive() {
+        return returnedAt == null;
+    }
 }

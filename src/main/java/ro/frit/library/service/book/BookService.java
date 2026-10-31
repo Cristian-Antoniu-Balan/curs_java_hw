@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import ro.frit.library.domain.book.Book;
 import ro.frit.library.repository.book.BookRepository;
+import ro.frit.library.service.ConflictException;
 import ro.frit.library.web.book.BookRequest;
 import ro.frit.library.web.book.BookUpdateRequest;
 
@@ -41,7 +42,7 @@ public class BookService {
         return bookRepository.findById(id)
             .map(existing -> {
                 if (bookRequest.copies() < existing.getLoanedCopies()) {
-                    throw new IllegalArgumentException(
+                    throw new ConflictException(
                         "Copies cannot be less than loaned copies (" + existing.getLoanedCopies() + ")"
                     );
                 }
@@ -75,7 +76,7 @@ public class BookService {
                 };
                 if (bookUpdateRequest.copies() != null) {
                     if (bookUpdateRequest.copies() < existing.getLoanedCopies()) {
-                        throw new IllegalArgumentException(
+                        throw new ConflictException(
                             "Copies cannot be less than loaned copies (" + existing.getLoanedCopies() + ")"
                         );
                     };
@@ -94,7 +95,7 @@ public class BookService {
         };
 
         if (existing.get().getLoanedCopies() > 0) {
-            throw new IllegalStateException("Cannot delete book with active loans: " + existing.get().getLoanedCopies());
+            throw new ConflictException("Cannot delete book with active loans: " + existing.get().getLoanedCopies());
         };
 
         return bookRepository.deleteById(id);

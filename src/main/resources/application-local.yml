@@ -5,4 +5,20 @@ library:
       copies: 3
     - title: The Hobbit
       author: J.R.R. Tolkien
+      copies: 2
+    - title: '1984'
+      author: George Orwell
+      copies: 4
+    - title: Pride and Prejudice
+      author: Jane Austen
       copies: 1
+  seed-members:
+    - first-name: Alice
+      last-name: Smith
+      email: alice.smith@example.com
+    - first-name: Bob
+      last-name: Jones
+      email: bob.jones@example.com
+    - first-name: Carla
+      last-name: Nguyen
+      email: carla.nguyen@example.com

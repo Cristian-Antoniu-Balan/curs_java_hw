@@ -7,9 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.springframework.stereotype.Service;
+import ro.frit.library.domain.book.Book;
 
-@Service 
 public class Library {
     private Map<String, Book> books = new LinkedHashMap<>();
     private final List<Loan> loans = new ArrayList<>();

@@ -1,4 +1,4 @@
-package ro.frit.library.web;
+package ro.frit.library.web.book;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;

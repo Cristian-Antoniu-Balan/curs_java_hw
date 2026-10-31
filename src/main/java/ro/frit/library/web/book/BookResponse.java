@@ -1,7 +1,7 @@
-package ro.frit.library.web;
+package ro.frit.library.web.book;
 
 import lombok.Builder;
-import ro.frit.library.domain.Book;
+import ro.frit.library.domain.book.Book;
 
 @Builder(toBuilder = true)
 public record BookResponse(String id, String title, String author, int copies, boolean isAvailable) {

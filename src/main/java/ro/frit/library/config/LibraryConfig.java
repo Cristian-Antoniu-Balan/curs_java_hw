@@ -7,8 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import ro.frit.library.config.LibraryProperties.SeedBook;
-import ro.frit.library.domain.Book;
-import ro.frit.library.repository.BookRepository;
+import ro.frit.library.domain.book.Book;
+import ro.frit.library.repository.book.BookRepository;
 
 @Configuration
 public class LibraryConfig {

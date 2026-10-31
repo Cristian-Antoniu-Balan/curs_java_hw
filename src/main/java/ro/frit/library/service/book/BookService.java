@@ -1,4 +1,4 @@
-package ro.frit.library.service;
+package ro.frit.library.service.book;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,10 +7,10 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import ro.frit.library.domain.Book;
-import ro.frit.library.repository.BookRepository;
-import ro.frit.library.web.BookRequest;
-import ro.frit.library.web.BookUpdateRequest;
+import ro.frit.library.domain.book.Book;
+import ro.frit.library.repository.book.BookRepository;
+import ro.frit.library.web.book.BookRequest;
+import ro.frit.library.web.book.BookUpdateRequest;
 
 @Service 
 @RequiredArgsConstructor 

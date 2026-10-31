@@ -1,4 +1,4 @@
-package ro.frit.library.web;
+package ro.frit.library.web.book;
 
 import java.util.List;
 
@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 import lombok.RequiredArgsConstructor;
-import ro.frit.library.service.BookService;
+import ro.frit.library.service.book.BookService;
 
 @RestController 
 @RequestMapping("/books")

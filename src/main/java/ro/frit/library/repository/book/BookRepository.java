@@ -1,9 +1,9 @@
-package ro.frit.library.repository;
+package ro.frit.library.repository.book;
 
 import java.util.List;
 import java.util.Optional;
 
-import ro.frit.library.domain.Book;
+import ro.frit.library.domain.book.Book;
 
 public interface BookRepository {
     List<Book> findAll();

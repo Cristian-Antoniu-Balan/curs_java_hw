@@ -1,4 +1,4 @@
-package ro.frit.library.domain;
+package ro.frit.library.domain.book;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

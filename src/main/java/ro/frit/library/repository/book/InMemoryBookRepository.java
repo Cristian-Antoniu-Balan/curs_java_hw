@@ -1,4 +1,4 @@
-package ro.frit.library.repository;
+package ro.frit.library.repository.book;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import ro.frit.library.domain.Book;
+import ro.frit.library.domain.book.Book;
 
 @Repository 
 public class InMemoryBookRepository implements BookRepository {

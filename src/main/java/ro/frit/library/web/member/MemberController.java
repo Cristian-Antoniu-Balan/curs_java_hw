@@ -34,17 +34,14 @@ public class MemberController {
     @Operation(summary = "List members")
     @GetMapping
     public List<MemberResponse> getAllMembers() {
-        return memberService.findAll().stream()
-            .map(MemberResponse::from)
-            .toList();
+        return memberService.findAllWithLoanCount();
     }
 
     @Operation(summary = "Get member by id")
     @ApiResponse(responseCode = "404", description = "Member not found")
     @GetMapping("/{id}")
     public MemberResponse member(@PathVariable("id") String id) {
-        return memberService.findById(id)
-            .map(MemberResponse::from)
+        return memberService.findOneByIdWithLoanCount(id)
             .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "No member with id: " + id));
     }
 
@@ -57,7 +54,7 @@ public class MemberController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MemberResponse postMember(@Valid @RequestBody MemberRequest memberRequest) {
-        return MemberResponse.from(memberService.createMember(memberRequest));
+        return memberService.createMember(memberRequest);
     }
 
     @Operation(summary = "Replace member")
@@ -72,7 +69,6 @@ public class MemberController {
         @PathVariable("id") String id,
         @Valid @RequestBody MemberRequest memberRequest) {
             return memberService.replace(id, memberRequest)
-                .map(MemberResponse::from)
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Member not found for id: " + id));
         }
     

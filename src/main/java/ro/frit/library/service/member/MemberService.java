@@ -1,8 +1,10 @@
 package ro.frit.library.service.member;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import ro.frit.library.repository.member.MemberRepository;
 import ro.frit.library.service.ConflictException;
 import ro.frit.library.service.EmailAlreadyInUseException;
 import ro.frit.library.web.member.MemberRequest;
+import ro.frit.library.web.member.MemberResponse;
 
 @Service 
 @RequiredArgsConstructor 
@@ -25,11 +28,25 @@ public class MemberService {
         return memberRepository.findAll();
     }
 
+    // DB should compute this - join tables
+    public List<MemberResponse> findAllWithLoanCount() {
+        Map<String, Long> loansPerMember = activeLoanCountByMemberId();
+        return memberRepository.findAll().stream()
+            .map(m -> MemberResponse.from(m, loansPerMember.getOrDefault(m.getId(), 0L).intValue()))
+            .toList();
+    }
+
     public Optional<Member> findById(String id) {
         return memberRepository.findById(id);
     }
 
-    public Member createMember(MemberRequest memberRequest) {
+    // DB should compute this - join tables
+    public Optional<MemberResponse> findOneByIdWithLoanCount(String memberId) {
+        return memberRepository.findById(memberId)
+            .map(m -> MemberResponse.from(m, activeLoanCountForMemberId(memberId)));
+    }
+
+    public MemberResponse createMember(MemberRequest memberRequest) {
         String newEmail = normalize(memberRequest.email());
         if (memberRepository.findByEmail(newEmail).isPresent()) {
             throw new EmailAlreadyInUseException(newEmail);
@@ -42,10 +59,11 @@ public class MemberService {
             .email(newEmail)
             .build();
 
-        return memberRepository.save(member);
+        Member saved = memberRepository.save(member);
+        return MemberResponse.from(saved, 0);
     }
 
-    public Optional<Member> replace(String id, MemberRequest memberRequest) {
+    public Optional<MemberResponse> replace(String id, MemberRequest memberRequest) {
         return memberRepository.findById(id)
             .map(existing -> {
                 String normalizedRequestEmail = normalize(memberRequest.email());
@@ -59,7 +77,8 @@ public class MemberService {
                     .email(normalizedRequestEmail)
                     .build();
                 
-                return memberRepository.save(updated);
+                Member saved = memberRepository.save(updated);
+                return MemberResponse.from(saved, activeLoanCountForMemberId(saved.getId()));
             });
     }
 
@@ -81,7 +100,24 @@ public class MemberService {
         return memberRepository.deleteById(id);
     }
 
+    public Map<String, MemberResponse> findAllAndMapById() {
+        return findAllWithLoanCount().stream()
+            .collect(Collectors.toMap(MemberResponse::id, m -> m));
+    }
+
     private static String normalize(String email) {
         return email.trim().toLowerCase();
+    }
+
+    private Map<String, Long> activeLoanCountByMemberId() {
+        return loanRepository.findAll().stream()
+            .filter(Loan::isActive)
+            .collect(Collectors.groupingBy(Loan::getMemberId, Collectors.counting()));
+    }
+
+    private int activeLoanCountForMemberId(String memberId) {
+        return (int) loanRepository.findAllByMemberId(memberId).stream()
+            .filter(Loan::isActive)
+            .count();
     }
 }

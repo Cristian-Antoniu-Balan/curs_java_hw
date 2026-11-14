@@ -1,6 +1,8 @@
 package ro.frit.library.web.loan;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +23,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ro.frit.library.domain.book.Book;
 import ro.frit.library.domain.loan.Loan;
-import ro.frit.library.domain.member.Member;
 import ro.frit.library.service.NotFoundException;
 import ro.frit.library.service.book.BookService;
 import ro.frit.library.service.loan.LoanService;
 import ro.frit.library.service.member.MemberService;
+import ro.frit.library.web.member.MemberResponse;
 
 @Tag(name = "Loans", description = "Loans catalog")
 @RestController 
@@ -42,8 +44,18 @@ public class LoanController {
         @Parameter(description = "If true, only active (not returned); if false, only returned; omit for all")
         @RequestParam(value = "active", required = false) Boolean active
     ) {
+        Map<String, Book> booksById = bookService.findAllAndMapById();
+        Map<String, MemberResponse> membersById = memberService.findAllAndMapById();
+
         return loanService.findAll(active).stream()
-            .map(this::toResponse)
+            .map(loan -> {
+                Book book = Optional.ofNullable(booksById.get(loan.getBookId()))
+                    .orElseThrow(() -> new NotFoundException("Invalid book"));
+                MemberResponse member = Optional.ofNullable(membersById.get(loan.getMemberId()))
+                    .orElseThrow(() -> new NotFoundException("Invalid member"));
+
+                return LoanResponse.from(loan, book, member);
+            })
             .toList();
     }
 
@@ -85,7 +97,7 @@ public class LoanController {
         Book book = bookService.findById(loan.getBookId())
             .orElseThrow(() -> new NotFoundException("Invalid book"));
         
-        Member member = memberService.findById(loan.getMemberId())
+        MemberResponse member = memberService.findOneByIdWithLoanCount(loan.getMemberId())
             .orElseThrow(() -> new NotFoundException("Invalid member"));
         
         return LoanResponse.from(loan, book, member);

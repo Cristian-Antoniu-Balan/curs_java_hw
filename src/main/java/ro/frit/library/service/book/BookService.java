@@ -1,8 +1,10 @@
 package ro.frit.library.service.book;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -102,4 +104,9 @@ public class BookService {
 
         return bookRepository.deleteById(id);
     }
+
+    public Map<String, Book> findAllAndMapById() {
+        return findAll(null).stream()
+            .collect(Collectors.toMap(Book::getId, b -> b));
+    } 
 }

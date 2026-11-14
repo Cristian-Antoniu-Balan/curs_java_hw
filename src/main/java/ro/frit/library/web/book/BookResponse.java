@@ -4,7 +4,7 @@ import lombok.Builder;
 import ro.frit.library.domain.book.Book;
 
 @Builder(toBuilder = true)
-public record BookResponse(String id, String title, String author, int copies, boolean isAvailable) {
+public record BookResponse(String id, String title, String author, int copies, int loanedCopies, boolean isAvailable) {
     
     public static BookResponse from(Book book) {
         return new BookResponse(
@@ -12,6 +12,7 @@ public record BookResponse(String id, String title, String author, int copies, b
             book.getTitle(),
             book.getAuthor(),
             book.getCopies(),
+            book.getLoanedCopies(),
             book.isAvailable()
         );
     }
